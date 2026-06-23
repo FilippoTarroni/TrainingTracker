@@ -1,0 +1,365 @@
+* {
+    margin: 0px;
+    padding: 0px; 
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: #ECE7F8;
+    display: flex;
+    min-height: 100vh;
+}
+
+a {
+    text-decoration: none;
+}
+
+.sidebar {
+    background-color: #1e1e2f;
+    color: #ECE7F8;
+    width: 200px; 
+    display: flex; 
+    flex-direction: column;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    z-index: 10;
+}
+
+.sidebar .logo {
+    padding: 20px;
+    text-align: center;
+    font-size: 1.2rem; 
+    border-bottom: 1px solid #2d2d44;  
+}
+
+.sidebar .menu {
+    flex: 1;
+    padding: 20px 0;
+}
+
+.sidebar .menu ul {
+    list-style: none; 
+}
+
+.sidebar .menu ul li a {
+    display: block; 
+    padding: 15px 25px;
+    color: #b3b3cb;
+    transition: all 0.3s ease;
+}
+
+.sidebar .menu ul li a:hover,
+.sidebar .menu ul li a.active {
+    background-color: #2d2d44;
+    color: #eee;
+    border-left: 4px solid #4e73df;
+}
+
+.main-content {
+    flex: 1;
+    background-color: #f5f2fc;
+    padding: 30px;
+}
+
+header {
+    margin-bottom: 30px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #d1d2d3;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+header h2 {
+    color: #4e73df;
+    display: flex;
+    align-items: center;
+}
+
+.content {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.card {
+    border-radius: 8px;
+    padding: 20px;
+    background: #ffffff;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    position: relative;
+    flex: 1 1 300px;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 15px rgba(0,0,0,0.08);
+}
+
+.card-header {
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin-bottom: 12px;
+    color: #4e73df;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-right: 30px;
+}
+
+.card-body p {
+    color: #333;
+    font-size: 0.95rem;
+    margin-bottom: 8px;
+    line-height: 1.5;
+    padding-right: 25px;
+}
+
+.card-body p strong {
+    color: #5a5c69;
+}
+
+.storicoHome {
+    flex: 1 1 100%;
+    max-width: 100%;
+    background: #fafafa;
+    opacity: 0.95;
+}
+
+button {
+    padding: 10px 20px;
+    background-color: #4e73df;
+    text-align: center;
+    cursor: pointer;
+    font-weight: 600;
+    display: inline-block;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    box-shadow: 0 4px 6px rgba(78, 115, 223, 0.2);
+    transition: all 0.2s ease;
+}
+
+button:hover {
+    background-color: #375a7f;
+    transform: translateY(-2px);
+}
+
+.modal {
+    display: none; 
+    position: fixed;
+    z-index: 100;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.45); 
+    backdrop-filter: blur(4px);
+    overflow-y: auto;          
+}
+
+.modal.show {
+    display: block;
+}
+
+.modal-content {
+    background-color: #ffffff;
+    margin: 40px auto;
+    padding: 40px 25px;
+    width: 92%;
+    max-width: 750px; 
+    min-height: auto;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.modal-content h3 {
+    color: #4e73df;
+    margin-bottom: 25px;
+    font-size: 1.6rem;
+    border-bottom: 2px solid #f5f2fc;
+    padding-bottom: 10px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.form-group label {
+    font-weight: 600;
+    color: #5a5c69;
+    font-size: 0.95rem;
+}
+
+.form-group input, 
+.form-group select, 
+.form-group textarea {
+    width: 100%;
+    padding: 11px 15px;
+    border: 1px solid #d1d2d3;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 0.95rem;
+    color: #333;
+    background-color: #f8f9fc;
+    transition: border-color 0.2s, background-color 0.2s;
+}
+
+.form-group input:focus, 
+.form-group select:focus, 
+.form-group textarea:focus {
+    outline: none;
+    border-color: #4e73df;
+    background-color: #ffffff;
+}
+
+.sezioneAllenamento, 
+#sezioneGara {
+    background: #f8f9fc;
+    padding: 20px;
+    border-radius: 8px;
+    border-left: 4px solid #4e73df;
+    margin-bottom: 20px;
+}
+
+.modal-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 30px;
+}
+
+.blocco-ripetuta {
+    background: #ffffff;
+    padding: 12px 15px;
+    border-radius: 6px;
+    margin-bottom: 10px;
+    border: 1px solid #e3e6f0;
+    border-left: 4px solid #36b9cc; 
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 15px;
+    animation: comparsaFluida 0.25s ease;
+}
+
+.blocco-ripetuta label {
+    font-weight: 600;
+    min-width: 100px;
+    color: #4e73df;
+}
+
+.gruppo-input-tempi {
+    display: flex;
+    gap: 10px;
+    flex: 1;
+    min-width: 250px;
+}
+
+.gruppo-input-tempi input {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid #d1d2d3;
+    border-radius: 4px;
+    background-color: #f8f9fc;
+}
+
+@keyframes comparsaFluida {
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.menu-card-container {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    z-index: 99;
+}
+
+.btn-menu-card {
+    background: transparent !important;
+    border: none !important;
+    color: #a0a2b1 !important;
+    font-size: 1.3rem !important;
+    width: 32px !important;
+    height: 32px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    box-shadow: none !important;
+    border-radius: 50% !important;
+    transition: background-color 0.2s, color 0.2s !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    transform: none !important;
+}
+
+.btn-menu-card:hover {
+    background-color: rgba(78, 115, 223, 0.1) !important;
+    color: #4e73df !important;
+}
+
+.dropdown-menu-card {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 36px;
+    background-color: #ffffff;
+    min-width: 150px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    border-radius: 6px;
+    border: 1px solid #e3e6f0;
+    overflow: hidden;
+    z-index: 100;
+}
+
+.dropdown-menu-card.show {
+    display: block;
+}
+
+.dropdown-item-card {
+    color: #333 !important;
+    padding: 10px 15px !important;
+    font-size: 0.85rem !important;
+    display: block !important;
+    width: 100% !important;
+    text-align: left !important;
+    background: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    font-weight: 500 !important;
+    cursor: pointer !important;
+    transform: none !important;
+}
+
+.dropdown-item-card:hover {
+    background-color: #f8f9fc !important;
+    color: #4e73df !important;
+}
+
+.dropdown-item-card.elimina {
+    color: #e74a3b !important;
+    border-top: 1px solid #f5f2fc !important;
+}
+
+.dropdown-item-card.elimina:hover {
+    background-color: #fff1f0 !important;
+    color: #e74a3b !important;
+}
+
+.storico-item {
+    position: relative;
+    padding: 15px 40px 15px 0;
+    border-bottom: 1px solid #eee;
+}
