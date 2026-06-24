@@ -36,101 +36,101 @@
                 </div>
                 <div class="card storicoHome">
                     <div class="card-header"><span>Storico Attività</span></div>
-                    <div class="card-body storicoHome">
+                    <div class="card-body" id= "storicoHome">
                         <p>non è stata aggiunta ancora nessuna attività</p>
                     </div>
                 </div>
             </section>
             <div id="modalAttivita" class="modal">
-     <div class="modal-content">
-        <h3>Nuova Attività</h3>
-            
-            <form id="formAttivita">
-                <div class="form-group">
-                    <label>Tipo di Attività</label>
-                    <select id="tipoAttivita">
-                        <option value="">Seleziona</option>
-                        <option value="allenamento">Allenamento</option>
-                        <option value="gara">Gara</option>
-                    </select> 
-                </div>
-                
-                <div class="form-group">
-                    <label>Data</label>
-                    <input type="date" id="dataAttivita">
-                </div>
-                
-                <div class="sezioneAllenamento" style="display:none">
-                    <div class="form-group">
-                        <label>Tipo di Allenamento</label>
-                        <select id="tipoAllenamento">
-                            <option value="">Seleziona</option>
-                            <option value="lungo">Lungo</option>
-                            <option value="ripetute">Ripetute</option>
-                            <option value="medio">Medio</option>
-                            <option value="fartlek">Fartlek</option>
-                            <option value="progressivo">Progressivo</option>
-                            <option value="lento">Lento</option>
-                            <option value="Tempo">Tempo Run</option>
-                            <option value="recovery">Recovery Run</option>
-                        </select>
-                    </div>
+            <div class="modal-content">
+                <h3>Nuova Attività</h3>
                     
-                    <div id="allenamentoSemplice" style="display: none">
+                    <form id="formAttivita">
                         <div class="form-group">
-                            <label>Distanza (km): </label>
-                            <input type="number" id="km" min="0.00000000001" step="any">
-                        </div>
-                        <div class="form-group">
-                            <label>Tempo: </label>
-                            <input type="text" id="tempoTotale" placeholder="es. 45:30">
-                        </div>
-                        <p style="margin: 10px 0; font-weight: 600; color: #4e73df;">
-                            Ritmo: <span id="ritmoCalcolato">-</span> /km
-                        </p>
-                    </div>
-                    
-                    <div id="allenamentoRipetute" style="display: none;">
-                        <div class="form-group">
-                            <label>Descrizione complessiva: </label>
-                            <input type="text" id="descrizioneRipetute" placeholder="ex. 5x600">
+                            <label>Tipo di Attività</label>
+                            <select id="tipoAttivita">
+                                <option value="">Seleziona</option>
+                                <option value="allenamento">Allenamento</option>
+                                <option value="gara">Gara</option>
+                            </select> 
                         </div>
                         
-                        <label style="font-weight: 600; color: #5a5c69; font-size: 0.9rem;">Tempi singole ripetute:</label>
-                        <div id="listaRipetute"></div>
-                    </div>
-                </div>
+                        <div class="form-group">
+                            <label>Data</label>
+                            <input type="date" id="dataAttivita">
+                        </div>
+                        
+                        <div class="sezioneAllenamento" style="display:none">
+                            <div class="form-group">
+                                <label>Tipo di Allenamento</label>
+                                <select id="tipoAllenamento">
+                                    <option value="">Seleziona</option>
+                                    <option value="lungo">Lungo</option>
+                                    <option value="ripetute">Ripetute</option>
+                                    <option value="medio">Medio</option>
+                                    <option value="fartlek">Fartlek</option>
+                                    <option value="progressivo">Progressivo</option>
+                                    <option value="lento">Lento</option>
+                                    <option value="Tempo">Tempo Run</option>
+                                    <option value="recovery">Recovery Run</option>
+                                </select>
+                            </div>
+                            
+                            <div id="allenamentoSemplice" style="display: none">
+                                <div class="form-group">
+                                    <label>Distanza (km): </label>
+                                    <input type="number" id="km" min="0.00000000001" step="any">
+                                </div>
+                                <div class="form-group">
+                                    <label>Tempo: </label>
+                                    <input type="text" id="tempoTotale" placeholder="es. 45:30">
+                                </div>
+                                <p style="margin: 10px 0; font-weight: 600; color: #4e73df;">
+                                    Ritmo: <span id="ritmoCalcolato">-</span> /km
+                                </p>
+                            </div>
+                            
+                            <div id="allenamentoRipetute" style="display: none;">
+                                <div class="form-group">
+                                    <label>Descrizione complessiva: </label>
+                                    <input type="text" id="descrizioneRipetute" placeholder="ex. 5x600">
+                                </div>
+                                
+                                <label style="font-weight: 600; color: #5a5c69; font-size: 0.9rem;">Tempi singole ripetute:</label>
+                                <div id="listaRipetute"></div>
+                            </div>
+                        </div>
 
-                <div id="sezioneGara" style="display:none">
-                    <div class="form-group">
-                        <label>Distanza: </label>
-                        <input type="text" id="tipoGara" placeholder="es. 800m">
-                    </div>
-                    <div class="form-group">
-                        <label>Luogo: </label>
-                        <input type="text" id="luogoGara">
-                    </div>
-                    <div class="form-group">
-                        <label>Tempo: </label>
-                        <input type="text" id="tempoGara" placeholder="es. 2:02.25">
-                    </div>
+                        <div id="sezioneGara" style="display:none">
+                            <div class="form-group">
+                                <label>Distanza: </label>
+                                <input type="text" id="tipoGara" placeholder="es. 800m">
+                            </div>
+                            <div class="form-group">
+                                <label>Luogo: </label>
+                                <input type="text" id="luogoGara">
+                            </div>
+                            <div class="form-group">
+                                <label>Tempo: </label>
+                                <input type="text" id="tempoGara" placeholder="es. 2:02.25">
+                            </div>
+                        </div>
+                        
+                        <div class="form-group" style="margin-top: 15px;">
+                            <label>Sensazioni</label>
+                            <textarea id="sensazioni" rows="3" placeholder="Come è andata?"></textarea>
+                        </div>
+                        
+                        <div class="modal-buttons">
+                            <button type="button" id="annullaModal" style="background-color: #ffffff; border-color: #4e73df; color:#5a5c69">Annulla</button>
+                            <button type="submit">Salva</button>
+                        </div>
+                    </form>
                 </div>
-                
-                <div class="form-group" style="margin-top: 15px;">
-                    <label>Sensazioni</label>
-                    <textarea id="sensazioni" rows="3" placeholder="Come è andata?"></textarea>
-                </div>
-                
-                <div class="modal-buttons">
-                    <button type="button" id="annullaModal" style="background-color: #ffffff; border-color: #4e73df; color:#5a5c69">Annulla</button>
-                    <button type="submit">Salva</button>
-                </div>
-            </form>
-        </div>
-    </div>
+            </div>
         </main>
-    <script src="js/script.js"></script>
     <script src="js/storage.js"></script>
     <script src="js/utilis.js"></script>
+    <script src="js/script.js"></script>
     </body>
 </html>
