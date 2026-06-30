@@ -363,3 +363,23 @@ button:hover {
     padding: 15px 40px 15px 0;
     border-bottom: 1px solid #eee;
 }
+
+#listaAllenamenti .card {
+    width:100%;
+    margin-bottom:20px;
+}
+
+#listaAllenamenti {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.allenamento-card {
+    width: 100%;
+}
+
+.grafico-allenamento {
+    margin-top: 20px;
+    height: 260px;
+}

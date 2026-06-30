@@ -20,37 +20,19 @@
         </aside>
         <main class="main-content">
             <header><h2>Profilo Utente</h2></header>
-            <form id="formUtente" class="card" style="margin-bottom: 20px;">
-                <div class="card-header">Inserisci dati</div>
-                <div class="card-body">
-                    <p>
-                        <label for="nome"><strong>Nome:</strong></label><br>
-                        <input id="nome" type="text" required>
-                    </p>
-                    
-                    <p>
-                        <label for="cognome"><strong>Cognome:</strong></label><br>
-                        <input id="cognome" type="text" required>
-                    </p>
-                    
-                    <p>
-                        <label for="eta"><strong>Età:</strong></label><br>
-                        <input id="eta" type="number" min="0" required>
-                    </p>
-                    <button type="submit">Salva</button>
-                </div>
-            </form>
             <div class="card card-profilo">
                 <div class="card-header">Informazioni Utente</div>
                 <div class="card-body">
                     <p><strong>Nome: </strong><span id="outNome"> - </span></p>
                     <p><strong>Cognome: </strong><span id="outCognome"> - </span></p>
                     <p><strong>Età: </strong><span id="outEta"> - </span></p>
+                    <p><strong>Km percorsi: </strong><span id="outKm"> - </span></p>
+                    <p><strong>Luogo Preferito: </strong></p>
                 </div>
             </div>
         </main>
-        <script src="js/script.js"></script>
         <script src="js/storage.js"></script>
         <script src="js/utilis.js"></script>
+        <script src="js/script.js"></script>
     </body>
 </html>
