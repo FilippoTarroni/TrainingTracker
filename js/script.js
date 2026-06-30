@@ -2,6 +2,7 @@
 // SCRIPT.JS - Logica dell'Interfaccia Utente (DOM)
 // ========================================================
 
+
 document.addEventListener("DOMContentLoaded", () => {
     // ELEMENTI DOM
     const btnAggiungi = document.querySelector(".aggiungiAttivita, .aggiungiAllenamento");
