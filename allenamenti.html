@@ -25,7 +25,7 @@
                     <button class="aggiungiAllenamento">+ Aggiungi Allenamento</button> 
                 </div>
             </header>
-            <section id="listaAllenamenti"></section>
+            
             <div id="modalAttivita" class="modal">
             <div class="modal-content">
                 <h3>Nuovo Allenamento</h3>
@@ -102,15 +102,45 @@
                         <div class="modal-buttons">
                             <button type="button" id="annullaModal" style="background-color: #ffffff; border-color: #4e73df; color:#5a5c69">Annulla</button>
                             <button type="submit">Salva</button>
-                            
+
                         </div>
                     </form>
                 </div>
             </div>
+            <div class="dashboard-cards">
+                <div class="card">
+                <div class="card-header">Forma Attuale:</div>
+                    <div class="card-body">
+                        <p><strong>Stato:</strong> In crescita ↑</p>
+                        <p><strong>Carico settimana:</strong> 32 km</p>
+                        <p><strong>Recupero:</strong> Buono</p>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">PB's: </div>
+                    <div class="card-body">
+                        <p><strong>400m:</strong> 52.48</p>
+                        <p><strong>800m:</strong> 2:02.25</p>
+                        <p><strong>Trend:</strong> ↗ miglioramento</p>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">Focus allenamento</div>
+                    <div class="card-body">
+                        <p>Resistenza lattacida</p>
+                        <p><strong>Obiettivo:</strong> migliorare 400–600m</p>
+                    </div>
+                </div>
+            </div>
+            
+            <h3>Ultimi Allenamenti</h3><br>
+            <section id="listaAllenamenti"></section>
         </main>
-    <script src="js/storage.js"></script>
-    <script src="js/utilis.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
-    <script src="js/script.js"></script>
+
+        <script src="js/storage.js"></script>
+        <script src="js/utilis.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+        <script src="js/script.js"></script>
     </body>
+    
 </html>

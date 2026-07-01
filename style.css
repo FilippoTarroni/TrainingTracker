@@ -383,3 +383,27 @@ button:hover {
     margin-top: 20px;
     height: 260px;
 }
+
+.dashboard-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-bottom: 30px;
+    width: 100%;
+}
+
+.dashboard-cards .card {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.dashboard-cards .card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.dashboard-cards .card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
