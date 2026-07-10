@@ -203,6 +203,8 @@ document.addEventListener("DOMContentLoaded", () => {
                     distanza: input.dataset.distanza,
                     tempo: input.value.trim()
                 }));
+                nuovaAttivita.recuperoRipetute = (document.getElementById("recuperoRipetute")?.value || "").trim();
+                nuovaAttivita.recuperoSerie = (document.getElementById("recuperoSerie")?.value || "").trim();
             } else {
                 const km=parseFloat(kmInput?.value);
                 const tempo = (tempoTotaleInput?.value || "").trim();
@@ -229,7 +231,15 @@ document.addEventListener("DOMContentLoaded", () => {
             nuovaAttivita.tipoGara = document.getElementById("tipoGara").value;
             nuovaAttivita.luogo = document.getElementById("luogoGara").value;
             nuovaAttivita.tempo = document.getElementById("tempoGara").value;
+
+            const passaggiInput = document.getElementById("passaggiGara");
+            nuovaAttivita.passaggi = passaggiInput && passaggiInput.value.trim()
+                ? passaggiInput.value.split(",").map(s => s.trim()).filter(Boolean)
+                : [];
         }
+
+        const valutazioneInput = document.getElementById("valutazione");
+        nuovaAttivita.valutazione = valutazioneInput ? valutazioneInput.value : "3";
 
         if(idAttivitaInModifica){
             const index = attivitaSalvate.findIndex(a=>a.id===idAttivitaInModifica);
@@ -276,6 +286,8 @@ document.addEventListener("DOMContentLoaded", () => {
             tipoAttivita.value = att.tipo;
             document.getElementById("dataAttivita").value = att.data;
             document.getElementById("sensazioni").value = att.sensazioni || "";
+            const valutazioneEl = document.getElementById("valutazione");
+            if(valutazioneEl) valutazioneEl.value = att.valutazione || "3";
 
             tipoAttivita.dispatchEvent(new Event("change"));
 
@@ -283,6 +295,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 document.getElementById("tipoGara").value = att.tipoGara || "";
                 document.getElementById("luogoGara").value = att.luogo || "";
                 document.getElementById("tempoGara").value = att.tempo || "";
+                const passaggiEl = document.getElementById("passaggiGara");
+                if(passaggiEl) passaggiEl.value = (att.passaggi || []).join(",");
             } else {
                 tipoAllenamento.value = att.tipoAllenamento;
                 if(tipoAllenamento) tipoAllenamento.dispatchEvent(new Event("change"));
@@ -290,6 +304,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 if(att.tipoAllenamento === "ripetute") {
                     descrizioneRipetute.value = att.descrizione || "";
                     descrizioneRipetute.dispatchEvent(new Event("input"));
+
+                    const recuperoRipeteEl = document.getElementById("recuperoRipetute");
+                    const recuperoSerieEl = document.getElementById("recuperoSerie");
+                    if(recuperoRipeteEl) recuperoRipeteEl.value = att.recuperoRipetute || "";
+                    if(recuperoSerieEl) recuperoSerieEl.value = att.recuperoSerie || "";
                     
                     // Ripopolamento automatico multi-input (funziona sia per singoli che per accoppiati!)
                     const inputs = document.querySelectorAll(".input-tempo-giro");
@@ -320,6 +339,336 @@ document.addEventListener("DOMContentLoaded", () => {
             </div>
         `;
     }
+
+    // ========================================================
+    // DASHBOARD ALLENAMENTI (Forma, PB, Focus)
+    // ========================================================
+    function aggiornaDashboard(){
+        const formaStatoEl = document.getElementById("formaStato");
+        if(!formaStatoEl) return; // non siamo nella pagina Allenamenti
+
+        const forma = calcolaFormaAttuale(attivitaSalvate);
+        // IMPORTANTE: innerHTML (non textContent) perché forma.stato può
+        // contenere il markup <img> di un'icona SVG.
+        formaStatoEl.innerHTML = forma.stato;
+        document.getElementById("kmSettimana").textContent = forma.kmSettimana;
+        document.getElementById("recupero").textContent = forma.recupero;
+
+        const profilo = caricaProfilo();
+        const pbMap = calcolaPB(attivitaSalvate, profilo);
+
+        const pb400 = pbMap["400"];
+        const pb800 = pbMap["800"];
+        document.getElementById("pb400").textContent = pb400 ? formattaTempoGara(pb400.secondi) : "-";
+        document.getElementById("pb800").textContent = pb800 ? formattaTempoGara(pb800.secondi) : "-";
+
+        let trendTesto = calcolaTrendGenerale(attivitaSalvate, pbMap);
+        const ultimaGara = attivitaSalvate
+            .filter(a => a.tipo === "gara")
+            .slice()
+            .sort((a, b) => new Date(b.data) - new Date(a.data))[0];
+        if(ultimaGara){
+            const contesto = analizzaContestoAllenamento(ultimaGara.data, ultimaGara.tempo, ultimaGara.tipoGara, attivitaSalvate);
+            if(contesto && contesto.scarico === "scarico") trendTesto += ` · scarico pre-gara rilevato ${iconaSvg("graficoBasso")}`;
+        }
+        // IMPORTANTE: innerHTML (non textContent), trendTesto contiene icone SVG.
+        document.getElementById("trend").innerHTML = trendTesto;
+
+        renderFocus();
+    }
+
+    function renderFocus(){
+        const focusTestoEl = document.getElementById("focusTesto");
+        if(!focusTestoEl) return;
+
+        const focus = caricaFocus();
+        if(focus && focus.focus){
+            focusTestoEl.innerHTML = `<strong>Focus:</strong> ${focus.focus}`;
+            document.getElementById("obiettivo").textContent = focus.obiettivo || "-";
+        } else {
+            focusTestoEl.innerHTML = `<strong>Focus:</strong> Da impostare`;
+            document.getElementById("obiettivo").textContent = "-";
+        }
+    }
+
+    // Unica card modificabile manualmente: mostra un piccolo form con un
+    // menu a tendina per scegliere il tipo di focus e un campo per l'obiettivo.
+    window.modificaFocus = function(){
+        if(document.getElementById("selectFocus")) return; // già in modifica
+
+        const focusTestoEl = document.getElementById("focusTesto");
+        if(!focusTestoEl) return;
+        const cardBody = focusTestoEl.closest(".card-body");
+        const focus = caricaFocus() || {};
+
+        cardBody.innerHTML = `
+            <div class="form-group">
+                <label>Focus</label>
+                <select id="selectFocus">
+                    <option value="">Seleziona</option>
+                    <option value="Velocità">Velocità</option>
+                    <option value="Resistenza">Resistenza</option>
+                    <option value="Forza">Forza</option>
+                    <option value="Tecnica di corsa">Tecnica di corsa</option>
+                    <option value="Recupero attivo">Recupero attivo</option>
+                    <option value="Preparazione gara">Preparazione gara</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Obiettivo</label>
+                <input type="text" id="inputObiettivo" placeholder="es. Migliorare il passo negli ultimi 200m">
+            </div>
+            <div class="modal-buttons">
+                <button type="button" id="annullaFocus" style="background-color:#ffffff;border:1px solid #4e73df;color:#5a5c69;">Annulla</button>
+                <button type="button" id="salvaFocusBtn">Salva</button>
+            </div>
+        `;
+
+        document.getElementById("selectFocus").value = focus.focus || "";
+        document.getElementById("inputObiettivo").value = focus.obiettivo || "";
+
+        function ripristinaVista(){
+            cardBody.innerHTML = `<p id="focusTesto"></p><p><strong>Obiettivo:</strong> <span id="obiettivo"></span></p>`;
+            renderFocus();
+        }
+
+        document.getElementById("annullaFocus").addEventListener("click", ripristinaVista);
+
+        document.getElementById("salvaFocusBtn").addEventListener("click", ()=>{
+            salvaFocus({
+                focus: document.getElementById("selectFocus").value,
+                obiettivo: document.getElementById("inputObiettivo").value.trim(),
+                data: new Date().toISOString()
+            });
+            ripristinaVista();
+        });
+    };
+
+    // ========================================================
+    // PAGINA PROFILO
+    // ========================================================
+    function paginaProfiloAttiva(){
+        return !!document.getElementById("profiloForm");
+    }
+
+    function renderProfilo(){
+        if(!paginaProfiloAttiva()) return;
+
+        const p = caricaProfilo();
+        document.getElementById("outNome").textContent = p.nome || "-";
+        document.getElementById("outCognome").textContent = p.cognome || "-";
+        document.getElementById("outEta").textContent = p.eta ? `${p.eta} anni` : "-";
+        document.getElementById("outSpecialita").textContent = p.specialita || "-";
+        document.getElementById("outLuogo").textContent = p.luogo || "-";
+
+        const kmTotali = attivitaSalvate.reduce((tot,a)=>tot+calcolaKmAllenamento(a),0);
+        document.getElementById("outKm").textContent = kmTotali.toFixed(1);
+
+        renderPersonalBest();
+    }
+
+    function renderPersonalBest(){
+        const contenitore = document.getElementById("listaPersonalBest");
+        if(!contenitore) return;
+
+        const p = caricaProfilo();
+        const pbMap = calcolaPB(attivitaSalvate, p);
+        const chiavi = Object.keys(pbMap).sort((a,b)=>parseInt(a)-parseInt(b));
+
+        if(chiavi.length === 0){
+            contenitore.innerHTML = "<p>Nessun personal best registrato. Aggiungine uno o registra una gara.</p>";
+            return;
+        }
+
+        contenitore.innerHTML = chiavi.map(k=>{
+            const pb = pbMap[k];
+            const fonte = pb.fonte === "gara"
+                ? `${pb.luogo || "Gara"}${pb.data ? " - " + formattaData(pb.data) : ""}`
+                : "PB iniziale";
+            const pista = pb.passaggi && pb.passaggi.length > 0
+                ? generaHtmlPista(analizzaPassaggi(pb.passaggi, pb.tempoStr, pb.distanzaLabel))
+                : "";
+            const contesto = (pb.fonte === "gara" && pb.data)
+                ? generaHtmlContestoAllenamento(analizzaContestoAllenamento(pb.data, pb.tempoStr, pb.distanzaLabel, attivitaSalvate))
+                : "";
+
+            return `
+                <div class="pb-item">
+                    <p>${iconaSvg("trofeo")}<strong>${pb.distanzaLabel}:</strong> ${formattaTempoGara(pb.secondi)} <small>(${fonte})</small></p>
+                    ${pista}
+                    ${contesto}
+                </div>
+            `;
+        }).join("");
+    }
+
+    // ========================================================
+    // CONTESTO ALLENAMENTO (analisi incrociata allenamenti <-> gare)
+    // Mostra, per i PB registrati come gara, cosa raccontano gli
+    // allenamenti dei giorni precedenti: è un'analisi statistica sui dati
+    // che l'utente ha inserito, non una previsione. Con poche sessioni di
+    // qualità nella finestra considerata lo segnala esplicitamente.
+    // ========================================================
+    function generaHtmlContestoAllenamento(contesto){
+        if(!contesto) return "";
+
+        if(!contesto.datiSufficienti){
+            return `
+                <div class="contesto-allenamento contesto-scarso">
+                    <p><strong>Contesto allenamento:</strong> nei ${contesto.finestraGiorni} giorni prima di questa gara non ho trovato almeno 2 sessioni di ripetute di ${contesto.famiglieRilevanti.join(" o ")}. Registra più allenamenti per un'analisi più precisa.</p>
+                </div>
+            `;
+        }
+
+        const righeExtra = [];
+        if(contesto.confrontoPasso){
+            const cp = contesto.confrontoPasso;
+            const direzione = cp.garaPiuVeloce ? "più veloce" : "più lento";
+            righeExtra.push(`Il passo gara (${secondiInFormato(cp.passoGaraSecKm)}/km) è del ${Math.abs(cp.scarto*100).toFixed(1)}% ${direzione} rispetto al passo medio di lavoro delle tue ripetute di ${contesto.famiglieRilevanti.join("/")} in quel periodo (${secondiInFormato(cp.passoAllenamentoMedioSecKm)}/km).`);
+        }
+        if(contesto.recuperoMedioSec){
+            righeExtra.push(`Recupero medio tra ripetute in quel periodo: ${secondiInFormato(contesto.recuperoMedioSec)}.`);
+        }
+
+        const messaggiScarico = {
+            scarico: `Scarico rilevato nell'ultima settimana pre-gara rispetto alla precedente. ${iconaSvg("graficoBasso")}`,
+            carico_alto: `Il carico è rimasto alto anche nell'ultima settimana pre-gara (nessun evidente scarico). ${iconaSvg("graficoAlto")}`,
+            stabile: `Carico stabile tra le due settimane precedenti la gara. ${iconaSvg("lineaDritta")}`,
+            dati_insufficienti: ""
+        };
+
+        return `
+            <div class="contesto-allenamento">
+                <p><strong>Contesto allenamento (ultimi ${contesto.finestraGiorni} giorni):</strong></p>
+                <p>Volume totale: ${contesto.kmTotali.toFixed(1)} km · Sessioni di ${contesto.famiglieRilevanti.join("/")}: ${contesto.numSessioniQualita}</p>
+                ${righeExtra.map(r=>`<p>${r}</p>`).join("")}
+                ${messaggiScarico[contesto.scarico] ? `<p>${messaggiScarico[contesto.scarico]}</p>` : ""}
+            </div>
+        `;
+    }
+
+    // ========================================================
+    // PISTA - Analisi dei passaggi nei PB
+    // Linea colorata divisa per tratti (verde=passo giusto, blu=troppo
+    // piano, rosso=troppo veloce, con le sfumature).
+    // ========================================================
+    function generaHtmlPista(analisi){
+        if(!analisi || analisi.length === 0) return "";
+
+        const segmenti = analisi.map(seg => `
+            <div class="segmento-pista" style="background:${seg.colore}" title="${seg.distanzaLabel}: ${seg.tempoStr}s (${seg.etichetta})">
+                <span>${seg.tempoStr}</span>
+            </div>
+        `).join("");
+
+        return `
+            <div class="pista-atletica">${segmenti}</div>
+            <div class="pista-legenda">
+                <span><i class="legenda-colore" style="background:rgb(78,115,223)"></i>Troppo piano</span>
+                <span><i class="legenda-colore" style="background:rgb(28,200,138)"></i>Passo giusto</span>
+                <span><i class="legenda-colore" style="background:rgb(231,74,59)"></i>Troppo veloce</span>
+            </div>
+        `;
+    }
+
+    window.modificaProfilo = function(){
+        const p = caricaProfilo();
+        const nomeEl = document.getElementById("inputNome");
+        if(!nomeEl) return;
+        nomeEl.value = p.nome || "";
+        document.getElementById("inputCognome").value = p.cognome || "";
+        document.getElementById("inputEta").value = p.eta || "";
+        document.getElementById("inputSpecialita").value = p.specialita || "";
+        document.getElementById("inputLuogo").value = p.luogo || "";
+
+        document.getElementById("profiloVista").style.display = "none";
+        document.getElementById("profiloForm").style.display = "block";
+    };
+
+    function chiudiFormProfilo(){
+        const form = document.getElementById("profiloForm");
+        const vista = document.getElementById("profiloVista");
+        if(form) form.style.display = "none";
+        if(vista) vista.style.display = "block";
+    }
+
+    document.getElementById("annullaProfilo")?.addEventListener("click", chiudiFormProfilo);
+
+    document.getElementById("salvaProfiloBtn")?.addEventListener("click", ()=>{
+        const esistente = caricaProfilo();
+        salvaProfilo({
+            ...esistente,
+            nome: document.getElementById("inputNome").value.trim(),
+            cognome: document.getElementById("inputCognome").value.trim(),
+            eta: document.getElementById("inputEta").value,
+            specialita: document.getElementById("inputSpecialita").value,
+            luogo: document.getElementById("inputLuogo").value.trim()
+        });
+        chiudiFormProfilo();
+        renderProfilo();
+    });
+
+    // --- PB iniziali (dichiarati all'iscrizione, prima di usare il sito) ---
+    function aggiungiRigaPb(pb = {}){
+        const contenitore = document.getElementById("righePbIniziali");
+        if(!contenitore) return;
+        const riga = document.createElement("div");
+        riga.className = "riga-pb-iniziale";
+        riga.innerHTML = `
+            <input type="text" class="pb-distanza" placeholder="es. 400m" value="${pb.distanza || ""}">
+            <input type="text" class="pb-tempo" placeholder="es. 52.30" value="${pb.tempo || ""}">
+            <input type="text" class="pb-passaggi" placeholder="passaggi cumulativi o per tratto, es. 25.0,27.48 (opz.)" value="${(pb.passaggi || []).join(",")}">
+            <input type="text" class="pb-luogo" placeholder="luogo (opz.)" value="${pb.luogo || ""}">
+            <button type="button" class="btn-mini rimuovi-riga-pb">✕</button>
+        `;
+        contenitore.appendChild(riga);
+    }
+
+    window.modificaPbIniziali = function(){
+        const listaEl = document.getElementById("listaPersonalBest");
+        const formEl = document.getElementById("formPbIniziali");
+        if(!listaEl || !formEl) return;
+
+        const p = caricaProfilo();
+        const contenitore = document.getElementById("righePbIniziali");
+        contenitore.innerHTML = "";
+        const elenco = (p.pbIniziali && p.pbIniziali.length > 0) ? p.pbIniziali : [{}];
+        elenco.forEach(pb => aggiungiRigaPb(pb));
+
+        listaEl.style.display = "none";
+        formEl.style.display = "block";
+    };
+
+    function chiudiFormPb(){
+        const listaEl = document.getElementById("listaPersonalBest");
+        const formEl = document.getElementById("formPbIniziali");
+        if(formEl) formEl.style.display = "none";
+        if(listaEl) listaEl.style.display = "block";
+    }
+
+    document.getElementById("aggiungiRigaPb")?.addEventListener("click", ()=> aggiungiRigaPb());
+    document.getElementById("annullaPb")?.addEventListener("click", chiudiFormPb);
+
+    document.getElementById("righePbIniziali")?.addEventListener("click",(e)=>{
+        if(e.target.matches(".rimuovi-riga-pb")){
+            e.target.closest(".riga-pb-iniziale").remove();
+        }
+    });
+
+    document.getElementById("salvaPbIniziali")?.addEventListener("click", ()=>{
+        const righe = Array.from(document.querySelectorAll(".riga-pb-iniziale"));
+        const pbIniziali = righe.map(r=>({
+            distanza: r.querySelector(".pb-distanza").value.trim(),
+            tempo: r.querySelector(".pb-tempo").value.trim(),
+            passaggi: r.querySelector(".pb-passaggi").value.split(",").map(s=>s.trim()).filter(Boolean),
+            luogo: r.querySelector(".pb-luogo").value.trim(),
+            data: ""
+        })).filter(pb => pb.distanza && pb.tempo);
+
+        salvaProfilo({...caricaProfilo(), pbIniziali});
+        chiudiFormPb();
+        renderPersonalBest();
+    });
 
     function valoreGraficoAllenamento(att){
         if(att.tipoAllenamento=="ripetute"){
@@ -352,12 +701,17 @@ document.addEventListener("DOMContentLoaded", () => {
             card.className = "card allenamento-card";
 
             let dettagli = "";
+            let famigliaCorrente = null;
 
             if (att.tipoAllenamento === "ripetute") {
                 const tempiValidi = att.ripetute ? att.ripetute.map(r => r.tempo) : [];
+                const metricheCorrente = calcolaMetricheRipetute(att);
+                famigliaCorrente = trovaFamigliaRipetuta(parseFloat(metricheCorrente.tipoRipetuta));
                 dettagli = `
-                    <strong>Descrizione:</strong> ${att.descrizione || ""}<br>
+                    <strong>Descrizione:</strong> ${att.descrizione || ""} <small style="color:#8a8ca0;">(${famigliaCorrente})</small><br>
                     <strong>Tempo medio:</strong> ${mediaTempi(tempiValidi)}<br>
+                    ${att.recuperoRipetute ? `<strong>Recupero tra ripetute:</strong> ${att.recuperoRipetute}<br>` : ""}
+                    ${att.recuperoSerie ? `<strong>Recupero tra serie:</strong> ${att.recuperoSerie}<br>` : ""}
                 `;
             } else {
                 dettagli = `
@@ -368,6 +722,22 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             const canvasId = `graficoAllenamento-${att.id}`;
+            const canvasFormaId = `graficoForma-${att.id}`;
+
+            const blocchiGrafico = att.tipoAllenamento === "ripetute"
+                ? `
+                    <div class="grafici-ripetute-wrap">
+                        <div class="grafico-ripetute-item">
+                            <p class="titolo-grafico-mini">Confronto multi-metrica (${famigliaCorrente})</p>
+                            <div class="grafico-allenamento"><canvas id="${canvasId}"></canvas></div>
+                        </div>
+                        <div class="grafico-ripetute-item">
+                            <p class="titolo-grafico-mini">Andamento forma stimato</p>
+                            <div class="grafico-allenamento"><canvas id="${canvasFormaId}"></canvas></div>
+                        </div>
+                    </div>
+                `
+                : `<div class="grafico-allenamento"><canvas id="${canvasId}"></canvas></div>`;
 
             card.innerHTML = `
                 <div class="card-header">
@@ -380,9 +750,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     <strong>Data:</strong> ${formattaData(att.data)}<br>
                     ${att.sensazioni ? `<strong>Sensazioni:</strong> ${att.sensazioni}<br>` : ""}
 
-                    <div class="grafico-allenamento">
-                        <canvas id="${canvasId}"></canvas>
-                    </div>
+                    ${blocchiGrafico}
                 </div>
             `;
 
@@ -393,49 +761,213 @@ document.addEventListener("DOMContentLoaded", () => {
                 .slice()
                 .sort((a, b) => new Date(a.data) - new Date(b.data));
 
+            const ctx = document.getElementById(canvasId);
+            if (!ctx || typeof Chart === "undefined") return;
+
+            if (att.tipoAllenamento === "ripetute") {
+                // Confronta solo allenamenti della stessa "famiglia" (es. non
+                // mescola ripetute di velocità pura con quelle di mezzofondo).
+                const similiStessaFamiglia = simili.filter(a => {
+                    const m = calcolaMetricheRipetute(a);
+                    return trovaFamigliaRipetuta(parseFloat(m.tipoRipetuta)) === famigliaCorrente;
+                });
+
+                // Finestra mobile sugli ultimi 5: se ce ne sono di più, viene
+                // scartato il più vecchio (mai quello appena inserito).
+                const recenti = similiStessaFamiglia.slice(-5);
+
+                creaGraficoRadarRipetute(ctx, recenti, att);
+
+                const ctxForma = document.getElementById(canvasFormaId);
+                if (ctxForma) creaGraficoFormaRipetute(ctxForma, recenti);
+                return;
+            }
+
             const labels = simili.map(a => formattaData(a.data));
             const valori = simili.map(a => valoreGraficoAllenamento(a));
 
-            const ctx = document.getElementById(canvasId);
-
-            if (ctx && typeof Chart !== "undefined") {
-                const grafico = new Chart(ctx, {
-                    type: "line",
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            label: att.tipoAllenamento === "ripetute" ? "Tempo medio" : "Ritmo al km",
-                            data: valori,
-                            borderColor: "#4e73df",
-                            backgroundColor: "#4e73df",
-                            tension: 0.35,
-                            pointRadius: 5,
-                            pointHoverRadius: 7
-                        }]
+            const grafico = new Chart(ctx, {
+                type: "line",
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: "Ritmo al km",
+                        data: valori,
+                        borderColor: "#4e73df",
+                        backgroundColor: "#4e73df33",
+                        fill: true,
+                        tension: 0.3,
+                        pointRadius: 6,
+                        pointHoverRadius: 8,
+                        pointBackgroundColor: "#4e73df"
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
                     },
-                    options: {
-                        responsive: true,
-                        plugins: {
-                            legend: {
-                                display: false
-                            }
-                        },
-                        scales: {
-                            y: {
-                                ticks: {
-                                    callback: value => secondiInFormato(value)
-                                }
+                    scales: {
+                        y: {
+                            ticks: {
+                                callback: value => secondiInFormato(value)
+                            },
+                            title: { display: true, text: "Ritmo (min/km)" }
+                        }
+                    }
+                }
+            });
+
+            graficiAllenamenti.push(grafico);
+        });
+    }
+
+    // ========================================================
+    // GRAFICO RADAR PER LE RIPETUTE
+    // Confronta più sessioni della stessa famiglia (es. solo mezzofondo
+    // veloce, o solo velocità pura) non solo sul tempo medio, ma anche su
+    // numero di serie, numero di ripetute totali, passo di lavoro e
+    // sensazioni riportate. Finestra mobile: mostra sempre le ultime 5
+    // sessioni della famiglia, scartando la più vecchia quando ce ne sono
+    // di più (mai quella appena inserita).
+    // ========================================================
+    function creaGraficoRadarRipetute(ctx, recenti, attCorrente) {
+        const metriche = recenti.map(a => calcolaMetricheRipetute(a));
+
+        const maxSerie = Math.max(1, ...metriche.map(m => m.numSerie));
+        const maxRipetute = Math.max(1, ...metriche.map(m => m.numRipetuteTotali));
+        const tempiMediValidi = metriche.map(m => m.tempoMedioSec).filter(v => v > 0);
+        const ritmiValidi = metriche.map(m => m.ritmoAlKmSec).filter(v => v > 0);
+        const minTempoMedio = tempiMediValidi.length ? Math.min(...tempiMediValidi) : 0;
+        const minRitmo = ritmiValidi.length ? Math.min(...ritmiValidi) : 0;
+
+        const palette = ["#4e73df", "#1cc88a", "#e74a3b", "#f6c23e", "#36b9cc"];
+
+        const datasets = metriche.map((m, i) => {
+            const colore = palette[i % palette.length];
+            const eSessioneCorrente = recenti[i].id === attCorrente.id;
+            return {
+                label: `${formattaData(recenti[i].data)}${eSessioneCorrente ? " (questa)" : ""}`,
+                data: [
+                    (m.numSerie / maxSerie) * 100,
+                    (m.numRipetuteTotali / maxRipetute) * 100,
+                    m.tempoMedioSec > 0 && minTempoMedio > 0 ? (minTempoMedio / m.tempoMedioSec) * 100 : 0,
+                    m.ritmoAlKmSec > 0 && minRitmo > 0 ? (minRitmo / m.ritmoAlKmSec) * 100 : 0,
+                    (m.sensazioneValore / 5) * 100
+                ],
+                borderColor: colore,
+                backgroundColor: colore + "33",
+                pointBackgroundColor: colore,
+                borderWidth: eSessioneCorrente ? 3 : 1.5,
+                _metriche: m
+            };
+        });
+
+        const grafico = new Chart(ctx, {
+            type: "radar",
+            data: {
+                labels: ["Serie", "Ripetute totali", "Tempo medio", "Passo di lavoro", "Sensazioni"],
+                datasets: datasets
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    r: {
+                        min: 0,
+                        max: 100,
+                        ticks: { display: false },
+                        pointLabels: { font: { size: 11 } }
+                    }
+                },
+                plugins: {
+                    legend: { display: true, position: "bottom", labels: { boxWidth: 12, font: { size: 11 } } },
+                    tooltip: {
+                        callbacks: {
+                            // Mostra il valore reale (non normalizzato) invece
+                            // del punteggio 0-100, molto più leggibile.
+                            label: (item) => {
+                                const m = item.dataset._metriche;
+                                const chiave = item.label;
+                                if (chiave === "Serie") return `Serie: ${m.numSerie}`;
+                                if (chiave === "Ripetute totali") return `Ripetute: ${m.numRipetuteTotali}`;
+                                if (chiave === "Tempo medio") return `Tempo medio: ${secondiInFormato(m.tempoMedioSec)}`;
+                                if (chiave === "Passo di lavoro") return `Passo: ${secondiInFormato(m.ritmoAlKmSec)}/km`;
+                                if (chiave === "Sensazioni") return `Sensazioni: ${m.sensazioneValore}/5`;
+                                return "";
                             }
                         }
                     }
-                });
-
-                graficiAllenamenti.push(grafico);
+                }
             }
         });
-    }   
+
+        graficiAllenamenti.push(grafico);
+    }
+
+    // ========================================================
+    // GRAFICO ANDAMENTO FORMA (stima euristica)
+    // Grafico a punti e linee sull'"indice di forma" calcolato incrociando
+    // passo di lavoro, recupero e volume delle sessioni simili. È una stima,
+    // non una previsione: serve a leggere il trend nel tempo.
+    // ========================================================
+    function creaGraficoFormaRipetute(ctx, recenti) {
+        if (recenti.length === 0) return;
+
+        const metriche = recenti.map(a => calcolaMetricheRipetute(a));
+        const indici = calcolaIndiceForma(metriche);
+        const labels = recenti.map(a => formattaData(a.data));
+
+        const grafico = new Chart(ctx, {
+            type: "line",
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: "Indice di forma (stima)",
+                    data: indici,
+                    borderColor: "#1cc88a",
+                    backgroundColor: "#1cc88a33",
+                    fill: true,
+                    tension: 0.3,
+                    pointRadius: 6,
+                    pointHoverRadius: 8,
+                    pointBackgroundColor: "#1cc88a"
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        min: 0,
+                        max: 100,
+                        title: { display: true, text: "Indice 0-100 (relativo al periodo)" }
+                    }
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            afterBody: (items) => {
+                                const i = items[0].dataIndex;
+                                const m = metriche[i];
+                                const righe = [`Serie × Ripetute: ${m.numSerie} × ${m.numRipetuteTotali}`];
+                                if (m.ritmoAlKmSec > 0) righe.push(`Passo lavoro: ${secondiInFormato(m.ritmoAlKmSec)}/km`);
+                                if (m.recuperoRipeteSec > 0) righe.push(`Recupero: ${secondiInFormato(m.recuperoRipeteSec)}`);
+                                return righe;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        graficiAllenamenti.push(grafico);
+    }
 
     function aggiornaInterfaccia(){
+        aggiornaDashboard();
+        renderProfilo();
         renderPaginaAllenamenti();
         const storico = document.querySelector(".storicoHome .card-body");
         const ultimoAllenamento = document.querySelector("#ultimoAllenamentoHome .card-body");

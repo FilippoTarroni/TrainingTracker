@@ -95,6 +95,14 @@
                                     <label>Descrizione complessiva: </label>
                                     <input type="text" id="descrizioneRipetute" placeholder="ex. 5x600">
                                 </div>
+                                <div class="form-group">
+                                    <label>Recupero tra le ripetute</label>
+                                    <input type="text" id="recuperoRipetute" placeholder="es. 1:30">
+                                </div>
+                                <div class="form-group">
+                                    <label>Recupero tra le serie (opzionale)</label>
+                                    <input type="text" id="recuperoSerie" placeholder="es. 3:00">
+                                </div>
                                 
                                 <label style="font-weight: 600; color: #5a5c69; font-size: 0.9rem;">Tempi singole ripetute:</label>
                                 <div id="listaRipetute"></div>
@@ -114,11 +122,27 @@
                                 <label>Tempo: </label>
                                 <input type="text" id="tempoGara" placeholder="es. 2:02.25">
                             </div>
+                            <div class="form-group">
+                                <label>Passaggi (opzionale)</label>
+                                <input type="text" id="passaggiGara" placeholder="es. 28.5,1:01.1,1:30.9 - tempo al cronometro a ogni passaggio">
+                                <small style="color:#5a5c69;font-size:0.78rem;">Puoi inserire i tempi cumulativi al cronometro oppure quelli già divisi per tratto: il sistema capisce da solo quale hai usato</small>
+                            </div>
                         </div>
                         
                         <div class="form-group" style="margin-top: 15px;">
                             <label>Sensazioni</label>
                             <textarea id="sensazioni" rows="3" placeholder="Come è andata?"></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Valutazione (1-5)</label>
+                            <select id="valutazione">
+                                <option value="1">1 - Molto dura</option>
+                                <option value="2">2 - Dura</option>
+                                <option value="3" selected>3 - Normale</option>
+                                <option value="4">4 - Buona</option>
+                                <option value="5">5 - Ottima</option>
+                            </select>
                         </div>
                         
                         <div class="modal-buttons">

@@ -384,6 +384,25 @@ button:hover {
     height: 260px;
 }
 
+.grafici-ripetute-wrap {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+}
+
+.grafico-ripetute-item {
+    flex: 1 1 280px;
+    min-width: 260px;
+}
+
+.titolo-grafico-mini {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #5a5c69;
+    margin-bottom: 6px;
+}
+
 .dashboard-cards {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -405,4 +424,155 @@ button:hover {
 .dashboard-cards .card:hover {
     transform: translateY(-4px);
     box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+.btn-mini{
+
+background:none;
+color:#4e73df;
+padding:3px;
+box-shadow:none;
+font-size:0.9rem;
+
+}
+
+.btn-mini:hover{
+
+background:none;
+transform:none;
+
+}
+
+/* ======================================================
+   LINEA COLORATA - Analisi dei passaggi nei PB
+   ====================================================== */
+.pista-atletica {
+    display: flex;
+    border-radius: 999px;
+    overflow: hidden;
+    margin: 10px 0 6px 0;
+    border: 2px solid #e3e6f0;
+}
+
+.segmento-pista {
+    flex: 1;
+    padding: 8px 4px;
+    text-align: center;
+    color: #fff;
+    font-size: 0.78rem;
+    font-weight: 700;
+    border-right: 1px dashed rgba(255,255,255,0.55);
+}
+
+.segmento-pista:last-child {
+    border-right: none;
+}
+
+.pista-legenda {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+    font-size: 0.75rem;
+    color: #5a5c69;
+    margin-bottom: 10px;
+}
+
+.legenda-colore {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-right: 4px;
+    vertical-align: middle;
+}
+
+/* ======================================================
+   PROFILO E PERSONAL BEST
+   ====================================================== */
+.pb-item {
+    padding: 12px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.pb-item:last-child {
+    border-bottom: none;
+}
+
+.riga-pb-iniziale {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.riga-pb-iniziale input {
+    flex: 1;
+    min-width: 110px;
+    padding: 8px 10px;
+    border: 1px solid #d1d2d3;
+    border-radius: 6px;
+    background-color: #f8f9fc;
+    font-family: inherit;
+    font-size: 0.9rem;
+}
+
+.riga-pb-iniziale .btn-mini {
+    color: #e74a3b;
+    font-size: 1rem;
+}
+
+/* ======================================================
+   CONTESTO ALLENAMENTO - Analisi incrociata allenamenti/gare
+   ====================================================== */
+.contesto-allenamento {
+    background: #f8f9fc;
+    border-left: 4px solid #4e73df;
+    border-radius: 6px;
+    padding: 10px 14px;
+    margin-top: 10px;
+}
+
+.contesto-allenamento p {
+    font-size: 0.82rem;
+    color: #5a5c69;
+    margin-bottom: 4px;
+    padding-right: 0;
+    line-height: 1.4;
+}
+
+.contesto-allenamento p strong {
+    color: #4e73df;
+}
+
+.contesto-allenamento.contesto-scarso {
+    border-left-color: #d1d2d3;
+    background: #fafafa;
+}
+/* ======================================================
+   ICONE SVG INLINE (al posto delle emoji)
+   ====================================================== */
+.icona-inline {
+    width: 16px;
+    height: 16px;
+    vertical-align: middle;
+    margin: 0 2px;
+    position: relative;
+    top: -1px;
+}
+
+.icona-matita {
+    width: 14px;
+    height: 14px;
+}
+
+.icona-festa {
+    width: 18px;
+    height: 18px;
+}
+
+.icona-trofeo {
+    width: 14px;
+    height: 14px;
+    margin-right: 4px;
 }

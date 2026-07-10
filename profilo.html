@@ -20,14 +20,82 @@
         </aside>
         <main class="main-content">
             <header><h2>Profilo Utente</h2></header>
+
             <div class="card card-profilo">
-                <div class="card-header">Informazioni Utente</div>
-                <div class="card-body">
+                <div class="card-header">
+                    Informazioni Utente
+                    <button class="btn-mini" onclick="modificaProfilo()"><img src="icons/matita.svg" alt="Modifica" class="icona-inline icona-matita"></button>
+                </div>
+
+                <div class="card-body" id="profiloVista">
                     <p><strong>Nome: </strong><span id="outNome"> - </span></p>
                     <p><strong>Cognome: </strong><span id="outCognome"> - </span></p>
                     <p><strong>Età: </strong><span id="outEta"> - </span></p>
-                    <p><strong>Km percorsi: </strong><span id="outKm"> - </span></p>
-                    <p><strong>Luogo Preferito: </strong></p>
+                    <p><strong>Specialità: </strong><span id="outSpecialita"> - </span></p>
+                    <p><strong>Luogo: </strong><span id="outLuogo"> - </span></p>
+                    <p><strong>Km totali registrati: </strong><span id="outKm"> - </span></p>
+                </div>
+
+                <div class="card-body" id="profiloForm" style="display:none">
+                    <div class="form-group">
+                        <label>Nome</label>
+                        <input type="text" id="inputNome">
+                    </div>
+                    <div class="form-group">
+                        <label>Cognome</label>
+                        <input type="text" id="inputCognome">
+                    </div>
+                    <div class="form-group">
+                        <label>Età</label>
+                        <input type="number" id="inputEta" min="1" max="120">
+                    </div>
+                    <div class="form-group">
+                        <label>Specialità</label>
+                        <select id="inputSpecialita">
+                            <option value="">Seleziona</option>
+                            <option value="100m">100m</option>
+                            <option value="200m">200m</option>
+                            <option value="400m">400m</option>
+                            <option value="800m">800m</option>
+                            <option value="1500m">1500m</option>
+                            <option value="5000m">5000m</option>
+                            <option value="10000m">10000m</option>
+                            <option value="Mezza maratona">Mezza maratona</option>
+                            <option value="Maratona">Maratona</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Luogo (società / città)</label>
+                        <input type="text" id="inputLuogo">
+                    </div>
+                    <div class="modal-buttons">
+                        <button type="button" id="annullaProfilo" style="background-color: #ffffff; border: 1px solid #4e73df; color:#5a5c69">Annulla</button>
+                        <button type="button" id="salvaProfiloBtn">Salva</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card card-pb" style="margin-top:20px;">
+                <div class="card-header">
+                    Personal Best
+                    <button class="btn-mini" onclick="modificaPbIniziali()"><img src="icons/matita.svg" alt="Modifica" class="icona-inline icona-matita"></button>
+                </div>
+
+                <div class="card-body" id="listaPersonalBest">
+                    <p>Nessun personal best registrato.</p>
+                </div>
+
+                <div class="card-body" id="formPbIniziali" style="display:none">
+                    <p style="margin-bottom:10px; color:#5a5c69; font-size:0.85rem;">
+                        Inserisci qui i PB che avevi già prima di iniziare a usare l'app.
+                        I passaggi sono opzionali: se li inserisci, potrai vedere l'analisi del passo sulla pista.
+                    </p>
+                    <div id="righePbIniziali"></div>
+                    <button type="button" id="aggiungiRigaPb" style="margin-bottom:15px;">+ Aggiungi PB</button>
+                    <div class="modal-buttons">
+                        <button type="button" id="annullaPb" style="background-color: #ffffff; border: 1px solid #4e73df; color:#5a5c69">Annulla</button>
+                        <button type="button" id="salvaPbIniziali">Salva</button>
+                    </div>
                 </div>
             </div>
         </main>

@@ -73,6 +73,14 @@
                                     <label>Descrizione complessiva: </label>
                                     <input type="text" id="descrizioneRipetute" placeholder="ex. 5x600">
                                 </div>
+                                <div class="form-group">
+                                    <label>Recupero tra le ripetute</label>
+                                    <input type="text" id="recuperoRipetute" placeholder="es. 1:30">
+                                </div>
+                                <div class="form-group">
+                                    <label>Recupero tra le serie (opzionale)</label>
+                                    <input type="text" id="recuperoSerie" placeholder="es. 3:00">
+                                </div>
                                 
                                 <label style="font-weight: 600; color: #5a5c69; font-size: 0.9rem;">Tempi singole ripetute:</label>
                                 <div id="listaRipetute"></div>
@@ -92,11 +100,27 @@
                                 <label>Tempo: </label>
                                 <input type="text" id="tempoGara" placeholder="es. 2:02.25">
                             </div>
+                            <div class="form-group">
+                                <label>Passaggi (opzionale)</label>
+                                <input type="text" id="passaggiGara" placeholder="es. 28.5,1:01.1,1:30.9 - tempo al cronometro a ogni passaggio">
+                                <small style="color:#5a5c69;font-size:0.78rem;">Puoi inserire i tempi cumulativi al cronometro oppure quelli già divisi per tratto: il sistema capisce da solo quale hai usato</small>
+                            </div>
                         </div>
                         
                         <div class="form-group" style="margin-top: 15px;">
                             <label>Sensazioni</label>
                             <textarea id="sensazioni" rows="3" placeholder="Come è andata?"></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Valutazione (1-5)</label>
+                            <select id="valutazione">
+                                <option value="1">1 - Molto dura</option>
+                                <option value="2">2 - Dura</option>
+                                <option value="3" selected>3 - Normale</option>
+                                <option value="4">4 - Buona</option>
+                                <option value="5">5 - Ottima</option>
+                            </select>
                         </div>
                         
                         <div class="modal-buttons">
@@ -108,29 +132,69 @@
                 </div>
             </div>
             <div class="dashboard-cards">
+
                 <div class="card">
-                <div class="card-header">Forma Attuale:</div>
+                    <div class="card-header">
+                        Forma Attuale
+                    </div>
+
                     <div class="card-body">
-                        <p><strong>Stato:</strong> In crescita ↑</p>
-                        <p><strong>Carico settimana:</strong> 32 km</p>
-                        <p><strong>Recupero:</strong> Buono</p>
+                        <p><strong>Stato:</strong> <span id="formaStato"></span></p>
+                        <p><strong>Carico settimana:</strong> <span id="kmSettimana"></span> km</p>
+                        <p><strong>Recupero:</strong> <span id="recupero"></span></p>
                     </div>
                 </div>
+
+
                 <div class="card">
-                    <div class="card-header">PB's: </div>
-                    <div class="card-body">
-                        <p><strong>400m:</strong> 52.48</p>
-                        <p><strong>800m:</strong> 2:02.25</p>
-                        <p><strong>Trend:</strong> ↗ miglioramento</p>
+
+                    <div class="card-header">
+                        PB's
                     </div>
+
+                    <div class="card-body">
+
+                        <p><strong>400m:</strong>
+                        <span id="pb400"></span>
+                        </p>
+
+                        <p><strong>800m:</strong>
+                        <span id="pb800"></span>
+                        </p>
+
+                        <p>
+                        <strong>Trend:</strong>
+                        <span id="trend"></span>
+                        </p>
+
+                    </div>
+
                 </div>
+
+
                 <div class="card">
-                    <div class="card-header">Focus allenamento</div>
-                    <div class="card-body">
-                        <p>Resistenza lattacida</p>
-                        <p><strong>Obiettivo:</strong> migliorare 400–600m</p>
+
+                    <div class="card-header">
+                        Focus allenamento
+                        <button class="btn-mini" onclick="modificaFocus()"><img src="icons/matita.svg" alt="Modifica" class="icona-inline icona-matita"></button>
                     </div>
+
+
+                    <div class="card-body">
+
+                        <p id="focusTesto"></p>
+
+                        <p>
+                        <strong>Obiettivo:</strong>
+                        <span id="obiettivo"></span>
+                        </p>
+
+
+                    </div>
+
                 </div>
+
+
             </div>
             
             <h3>Ultimi Allenamenti</h3><br>
